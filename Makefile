@@ -1,53 +1,81 @@
 CC=g++
 AR=ar
-ARFLAGS=rvs
-CFLAGS=-c -Wall -std=c++11
-LDFLAGS=
+ARFLAGS=-rcvs
+CFLAGS=-Wall -std=c++11 -Wextra
+LDFLAGS=-L./lib
 
-CORE_SOURCE=./src/common/*.cpp
-CORE_SOURCE=$(wildcard ./src/common/*/*.cpp)
-
-CLIENT_SOURCE=./src/client/*.cpp
-CLIENT_SOURCE=$(wildcard ./src/client/*/*.cpp)
-
-SERVER_SOURCE=./src/server/*.cpp
-SERVER_SOURCE=$(wildcard ./src/server/*/*.cpp)
-
-TEST_SOURCE=./src/test/*.cpp
-
-CORE_OBJECTS=$(CORE_SOURCE:.cpp=.o)
-CLIENT_OBJECTS=$(CLIENT_SOURCE:.cpp=.o)
-SERVER_OBJECTS=$(SERVER_SOURCE:.cpp=.o)
-TEST_OBJECTS=$(TEST_SOURCE:.cpp=.o)
-
-INCLUDE=-I./libraries/Catch/include
-INCLUDE=-I./libraries/asio/asio/include
-INCLUDE=-I./src/common
-INCLUDE=-I./src/client
-INCLUDE=-I./src/server
-INCLUDE=-I./src/tests
+INCLUDE=-Ilibraries/Catch/single_include
+INCLUDE+=-Ilibraries/asio/asio/include
+INCLUDE+=-Isrc/common
+INCLUDE+=-Isrc/client
+INCLUDE+=-Isrc/server
+INCLUDE+=-Isrc/test
 
 LIBDIR=lib
 BINDIR=bin
+BUILDDIR=build
 
-CLIENT=$(BIRDIR)/som_client
+CLIENT=$(BINDIR)/som_client
 SERVER=$(BINDIR)/som_server
 TESTS=$(BINDIR)/tests
 LIBCORE=$(LIBDIR)/libsomcore.a
+LIBCORE_LINK=-lsomcore
+
+CORE_SOURCE = $(wildcard src/common/*.cpp) $(wildcard src/common/*/*.cpp)
+
+CLIENT_SOURCE = $(wildcard src/client/*.cpp) $(wildcard src/client/*/*.cpp)
+
+SERVER_SOURCE = $(wildcard src/server/*.cpp) $(wildcard src/server/*/*.cpp)
+
+TEST_SOURCE = $(wildcard src/test/*.cpp)
+
+_CORE_OBJECTS = $(CORE_SOURCE:.cpp=.o)
+_CLIENT_OBJECTS = $(CLIENT_SOURCE:.cpp=.o)
+_SERVER_OBJECTS = $(SERVER_SOURCE:.cpp=.o)
+_TEST_OBJECTS = $(TEST_SOURCE:.cpp=.o)
+
+CORE_OBJECTS = $(patsubst %,$(BUILDDIR)/%,$(_CORE_OBJECTS))
+CLIENT_OBJECTS = $(patsubst %,$(BUILDDIR)/%,$(_CLIENT_OBJECTS))
+SERVER_OBJECTS = $(patsubst %,$(BUILDDIR)/%,$(_SERVER_OBJECTS))
+TEST_OBJECTS = $(patsubst %,$(BUILDDIR)/%,$(_TEST_OBJECTS))
+
+.PHONY: clean dirs
 
 all: $(CLIENT) $(SERVER) $(TESTS) $(LIBCORE)
+	echo "Building all"
+
+tests: $(TESTS)
+	@echo $(TEST_SOURCE)
+
+client: $(CLIENT)
+
+server: $(SERVER)
+
+libcore: $(LIBCORE)
 
 $(LIBCORE): $(CORE_OBJECTS)
-  $(AR) $@ $(CORE_OBJECTS)
+	@echo Building $(LIBCORE)
+	@mkdir -p $(@D)
+	$(AR) $(ARFLAGS) $@ $^
 
 $(CLIENT): $(LIBCORE) $(CLIENT_OBJECTS)
-  $(CC) -l$(LIBCORE) $(CLIENT_OBJECTS) -o $(CLIENT)
+	@echo Building $(CLIENT)
+	@mkdir -p $(@D)
+	$(CC) $(CLIENT_OBJECTS) -o $@ $(CFLAGS) $(LDFLAGS) $(LIBCORE_LINK)
 
 $(SERVER): $(LIBCORE) $(SERVER_OBJECTS)
-  $(CC) -l$(LIBCORE) $(SERVER_OBJECTS) -o $(SERVER)
+	@echo Building $(SERVER)
+	@mkdir -p $(@D)
+	$(CC) $(SERVER_OBJECTS) -o $@ $(CFLAGS) $(LDFLAGS) $(LIBCORE_LINK)
 
-$(TESTS): $(LIBCORE) $(SERVER_OBJECTS) $(CLIENT_OBJECTS) $(TEST_OBJECS)
-  $(CC) -l$(LIBCORE) $(TEST_OBJECTS) $(SERVER_OBJECTS) $(CLIENT_OBJECTS) -o $(TEST)
+$(TESTS): $(LIBCORE) $(TEST_OBJECTS)
+	@echo Building $(TESTS)
+	@mkdir -p $(@D)
+	$(CC) $(TEST_OBJECTS) -o $@ $(CFLAGS) $(LIBFLAGS) $(LDFLAGS) $(LIBCORE_LINK)
 
-.cpp.o:
-  $(CC) $(CFLAGS) $< -o $@
+$(BUILDDIR)/%.o : %.cpp
+	@mkdir -p $(@D)
+	$(CC) -c $(INCLUDE) -o $@ $< $(CFLAGS)
+
+clean:
+	rm $(CLIENT_OBJECTS) $(SERVER_OBJECTS) $(TEST_OBJECTS) $(CORE_OBJECTS) $(CLIENT) $(SERVER) $(TESTS) $(LIBCORE)

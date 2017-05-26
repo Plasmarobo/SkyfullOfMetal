@@ -1,11 +1,13 @@
 #ifndef SKYFULL_SERVER_H
 #define SKYFULL_SERVER_H
 
-#include <iostream>
-#include <asio/include/asio.hpp>
+#include <string>
 #include <utility/channel.h>
+#define ASIO_STANDALONE 1
+#define ASIO_HEADER_ONLY 1
+#include <asio/include/asio.hpp>
 
-// Simple dummy server class
+// Simple local server
 class LocalServer : public IChannel {
  public:
   LocalServer();
@@ -16,17 +18,17 @@ class LocalServer : public IChannel {
     _remote->QueueMessage(pmsg);
   }
 
-  bool Connect(IChannel *remote) { _remote = remote };
-  bool Connected() { return _remote != NULL; }
+  bool Connect(IChannel *remote) override { _remote = remote; }
+  bool Connected() override { return _remote != NULL; }
 };
 
 // ASIO network server
 class NetServer : public IChannel {
  public:
-  NetServer(uint16_t port);
+  explicit NetServer(uint16_t port);
 
-  bool Connect(IChannel *remote);
-  bool Connected();
+  bool Connect(IChannel *remote) override;
+  bool Connected() override;
 
   void QueueMessage(message_ptr pmsg) override;
   void Send(message_ptr pmsg) override;

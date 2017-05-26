@@ -2,9 +2,9 @@
 #ifndef EVENT_LISTENER_H
 #define EVENT_LISTENER_H
 
+#include <events/events.h>
 #include <utility>
 #include <vector>
-#include <events/events.h>
 
 class Listener {
  public:
@@ -14,6 +14,20 @@ class Listener {
       auto ev = std::dynamic_pointer_cast<T>(data);
       if (ev) proc(ev);
     });
+  }
+
+  bool RemoveHandler(IEvent::id_t id) {
+    if (_EventDispatcher.expired()) return false;
+    auto em = _EventDispatcher.lock();
+    auto ev = std::find_if(_Subscriptions.begin(),
+                           _Subscriptions.end(),
+                           [&id](const _EventHandler& obj){
+                            return obj.first == id;
+                           });
+    if (ev == _Subscriptions.end()) return false;
+    em->RemoveListener(ev.first, ev.second);
+    _Subscriptions.erase(ev);
+    return true;
   }
 
  protected:
@@ -36,6 +50,7 @@ class Listener {
     if (em->AddListener(id, proc)) {
       _Subscriptions.push_back(_EventHandler(id, proc));
     }
+    return true;
   }
 
  private:

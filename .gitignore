@@ -1,4 +1,7 @@
 *.o
 *.bin
 bin/*
-
+lib/*
+*.a
+build
+build/*
