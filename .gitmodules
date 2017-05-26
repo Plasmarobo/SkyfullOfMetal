@@ -1,0 +1,6 @@
+[submodule "libraries/Catch"]
+	path = libraries/Catch
+	url = git@github.com:philsquared/Catch.git
+[submodule "libraries/asio"]
+	path = libraries/asio
+	url = git@github.com:chriskohlhoff/asio.git
