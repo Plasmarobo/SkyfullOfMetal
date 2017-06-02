@@ -5,6 +5,7 @@ CFLAGS=-Wall -std=c++11 -Wextra
 LDFLAGS=-L./lib
 
 INCLUDE=-Ilibraries/Catch/single_include
+INCLUDE+=-Ilibraries/flatbuffers/include
 INCLUDE+=-Ilibraries/asio/asio/include
 INCLUDE+=-Isrc/common
 INCLUDE+=-Isrc/client

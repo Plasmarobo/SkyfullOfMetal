@@ -1,0 +1,14 @@
+{
+  pos: {
+    x: 1,
+    y: 2,
+    z: 3
+  },
+  name: "robot",
+  wearing_type: "Suit",
+  wearing: {
+    capaticy: -1,
+    armor: 1,
+    name: "Robot Shell"
+  }
+}

@@ -4,3 +4,6 @@
 [submodule "libraries/asio"]
 	path = libraries/asio
 	url = git@github.com:chriskohlhoff/asio.git
+[submodule "libraries/flatbuffers"]
+	path = libraries/flatbuffers
+	url = git@github.com:google/flatbuffers.git

@@ -3,9 +3,7 @@
 
 #include <string>
 #include <utility/channel.h>
-#define ASIO_STANDALONE 1
-#define ASIO_HEADER_ONLY 1
-#include <asio/include/asio.hpp>
+#include <utility/macros.h>
 
 // Simple local server
 class LocalServer : public IChannel {

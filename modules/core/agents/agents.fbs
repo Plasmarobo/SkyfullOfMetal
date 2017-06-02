@@ -1,0 +1,53 @@
+//IDL for an agent
+
+namespace SkyfullOfMetal.Core;
+
+enum Color:byte { Red = 0, Green, Blue = 5 }
+
+union Equipment { Tool, Weapon, Contianer, Suit }
+
+struct Vec3 {
+  x:float;
+  y:float;
+  z:float;
+}
+
+union Target { Equipment, Item, Vec3, Agent }
+
+table Agent {
+  position:Vec3;
+  target:Target;
+  health:short = 100;
+  max_health:short = 100;
+  name:string;
+  faction:string;
+  inventory:[ubyte];
+  color:Color = Blue;
+  equipment:[Equipment];
+  wearing:Equipment;
+  holding:Equipment;
+  weight:short;
+}
+
+table Tool {
+  name:string;
+}
+
+table Weapon {
+  name:string;
+  range:short;
+  damage:short;
+}
+
+table Container {
+  name:string;
+  capacity:short;
+}
+
+table Suit {
+  name:string;
+  capacity:short;
+  armor:short;
+}
+
+root_type Agent;
